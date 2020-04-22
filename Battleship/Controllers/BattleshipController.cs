@@ -20,30 +20,33 @@ namespace Battleship.API.Controllers
         private const int OpponentId = 2;
 
         // Services
-        private IMemoryCache _memoeryCache;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IBattleshipUtility _battleshipUtility;
 
-        public BattleshipController(IMemoryCache memoryCache)
+        public BattleshipController(IMemoryCache memoryCache, IBattleshipUtility battleshipUtility)
         {
-            _memoeryCache = memoryCache;
+            _memoryCache = memoryCache;
+            _battleshipUtility = battleshipUtility;
         }
 
         [HttpGet]
         public BattleshipResult Get()
         {
-            var playerBoard = BattleshipUtility.CreateDefaultBoard();
-            var opponentBoard = BattleshipUtility.CreateDefaultBoard();
+            var playerBoard = _battleshipUtility.CreateDefaultBoard();
+            var opponentBoard = _battleshipUtility.CreateDefaultBoard();
 
-            var battleship1Added = BattleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
-            var battleship2Added = BattleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
-            var battleship3Added = BattleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
+            // Add battle ships for opponent
+            var battleship1Added = _battleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
+            var battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
+            var battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
 
-            _memoeryCache.GetOrCreate(PlayerId, entry =>
+            _memoryCache.GetOrCreate(PlayerId, entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return playerBoard;
             });
 
-            _memoeryCache.GetOrCreate(OpponentId, entry =>
+            _memoryCache.GetOrCreate(OpponentId, entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return opponentBoard;
@@ -62,10 +65,10 @@ namespace Battleship.API.Controllers
         [HttpPost("add")]
         public BattleshipResult Add([FromBody] BattleshipOptions battleshipOptions)
         {
-            var playerBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
-            var battleshipAdded = BattleshipUtility.AddBattleship(playerBoard, battleshipOptions.Row, battleshipOptions.Column, battleshipOptions.ShipSize.GetValueOrDefault(), battleshipOptions.Alignment);
+            var playerBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
+            var battleshipAdded = _battleshipUtility.AddBattleship(playerBoard, battleshipOptions.Row, battleshipOptions.Column, battleshipOptions.ShipSize.GetValueOrDefault(), battleshipOptions.Alignment);
 
-            var opponentBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
+            var opponentBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
             return new BattleshipResult
             {
                 PlayerBoard = DisplayBoard(playerBoard),
@@ -79,9 +82,9 @@ namespace Battleship.API.Controllers
         [HttpPost("attackOpponent")]
         public BattleshipResult AttackOpponent([FromBody] BattleshipOptions battleshipOptions)
         {
-            var playerBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
-            var opponentBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
-            var battleshipAttacked = BattleshipUtility.Attack(opponentBoard, battleshipOptions.Row, battleshipOptions.Column);
+            var playerBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
+            var opponentBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
+            var battleshipAttacked = _battleshipUtility.Attack(opponentBoard, battleshipOptions.Row, battleshipOptions.Column);
             return new BattleshipResult
             {
                 PlayerBoard = DisplayBoard(playerBoard),
@@ -95,8 +98,8 @@ namespace Battleship.API.Controllers
         [HttpPost("reset")]
         public string Reset([FromBody] BattleshipOptions battleshipOptions)
         {
-            _memoeryCache.Remove(battleshipOptions.PlayerId);
-            _memoeryCache.Remove(battleshipOptions.OpponentId);
+            _memoryCache.Remove(battleshipOptions.PlayerId);
+            _memoryCache.Remove(battleshipOptions.OpponentId);
             return "Board has been reset";
         }
 

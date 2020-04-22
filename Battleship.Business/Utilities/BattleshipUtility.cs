@@ -4,9 +4,9 @@ using Battleship.Business.Models;
 
 namespace Battleship.Business.Utilities
 {
-    public class BattleshipUtility
+    public class BattleshipUtility : IBattleshipUtility
     {
-        public static Cell[][] CreateDefaultBoard()
+        public Cell[][] CreateDefaultBoard()
         {
             return new Cell[10][]
             {
@@ -23,7 +23,7 @@ namespace Battleship.Business.Utilities
             };
         }
 
-        public static string AddBattleship(Cell[][] board, int row, int column, int shipSize, string alignment)
+        public string AddBattleship(Cell[][] board, int row, int column, int shipSize, string alignment)
         {
             if (row <= 0 || row > Constants.BattleShip.MaxRows)
                 return $"Not a valid row of {++row}, cannot be less than 1 or more than {Constants.BattleShip.MaxRows}";
@@ -71,7 +71,7 @@ namespace Battleship.Business.Utilities
             return $"Battleship created starting at position of row: {++row}, column: {++column}";
         }
 
-        public static string Attack(Cell[][] board, int row, int column)
+        public string Attack(Cell[][] board, int row, int column)
         {
             if (row <= 0 || row > Constants.BattleShip.MaxRows)
                 return $"Not a valid row of {++row}, cannot be less than 1 or more than {Constants.BattleShip.MaxRows}";

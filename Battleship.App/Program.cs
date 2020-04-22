@@ -15,6 +15,8 @@ namespace Battleship.App
 
         static void Main(string[] args)
         {
+            /*
+            BattleshipUtility = new BattleshipUtility();
             var playerBoard = BattleshipUtility.CreateDefaultBoard();
 
             PrintBoard(playerBoard);
@@ -68,6 +70,7 @@ namespace Battleship.App
             Console.ReadLine();
 
             Console.Read();
+            */
         }
 
         private static void PrintBoard(Cell[][] playerBoard)

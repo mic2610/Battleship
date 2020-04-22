@@ -1,3 +1,4 @@
+using Battleship.Business.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ namespace Battleship.API
         {
             services.AddControllers();
             services.AddMemoryCache();
+            services.AddScoped<IBattleshipUtility, BattleshipUtility>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

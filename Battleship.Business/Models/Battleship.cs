@@ -2,6 +2,8 @@
 {
     public class Battleship : Cell
     {
+        public Battleship() { }
+
         public Battleship(string value) : base(value)
         {
         }
