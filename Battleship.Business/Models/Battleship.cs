@@ -6,9 +6,9 @@
         {
         }
 
-        public int StartX { get; set; }
+        public int StartRow { get; set; }
 
-        public int StartY { get; set; }
+        public int StartColumn { get; set; }
 
         public int Length { get; set; }
 

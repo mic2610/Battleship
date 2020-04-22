@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Battleship.Business.Constants;
 using Battleship.Business.Models;
 using Battleship.Business.Utilities;
 
@@ -20,7 +21,7 @@ namespace Battleship.App
             Console.WriteLine("Player Board created");
             Console.ReadLine();
 
-            var battleship1Added = BattleshipUtility.AddBattleship(playerBoard, 1, 1, 3, BattleshipUtility.Horizontal);
+            var battleship1Added = BattleshipUtility.AddBattleship(playerBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
             PrintBoard(playerBoard);
             Console.WriteLine(battleship1Added);
             Console.ReadLine();
@@ -41,12 +42,12 @@ namespace Battleship.App
             Console.WriteLine(battleship1Attacked3);
             Console.ReadLine();
 
-            var battleship2Added = BattleshipUtility.AddBattleship(playerBoard, 3, 3, 4, BattleshipUtility.Vertical);
+            var battleship2Added = BattleshipUtility.AddBattleship(playerBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
             PrintBoard(playerBoard);
             Console.WriteLine(battleship2Added);
             Console.ReadLine();
 
-            var battleship2AddedAgain = BattleshipUtility.AddBattleship(playerBoard, 4, 3, 4, BattleshipUtility.Vertical);
+            var battleship2AddedAgain = BattleshipUtility.AddBattleship(playerBoard, 4, 3, 4, Business.Constants.BattleShip.Vertical);
             PrintBoard(playerBoard);
             Console.WriteLine(battleship2AddedAgain);
             Console.ReadLine();

@@ -10,8 +10,8 @@ namespace Battleship.Business.Models
 
         public List<string> Results { get; set; }
 
-        public string PlayerId { get; set; }
+        public int PlayerId { get; set; }
 
-        public string OpponentId { get; set; }
+        public int OpponentId { get; set; }
     }
 }

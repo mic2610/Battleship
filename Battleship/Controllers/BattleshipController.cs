@@ -15,6 +15,11 @@ namespace Battleship.API.Controllers
     [ApiController]
     public class BattleshipController : ControllerBase
     {
+        // Constants
+        private const int PlayerId = 1;
+        private const int OpponentId = 2;
+
+        // Services
         private IMemoryCache _memoeryCache;
 
         public BattleshipController(IMemoryCache memoryCache)
@@ -28,19 +33,17 @@ namespace Battleship.API.Controllers
             var playerBoard = BattleshipUtility.CreateDefaultBoard();
             var opponentBoard = BattleshipUtility.CreateDefaultBoard();
 
-            var battleship1Added = BattleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, BattleshipUtility.Horizontal);
-            var battleship2Added = BattleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, BattleshipUtility.Horizontal);
-            var battleship3Added = BattleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, BattleshipUtility.Vertical);
+            var battleship1Added = BattleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
+            var battleship2Added = BattleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
+            var battleship3Added = BattleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
 
-            var playerId = Guid.NewGuid().ToString();
-            _memoeryCache.GetOrCreate(playerId, entry =>
+            _memoeryCache.GetOrCreate(PlayerId, entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return playerBoard;
             });
 
-            var opponentId = Guid.NewGuid().ToString();
-            _memoeryCache.GetOrCreate(opponentId, entry =>
+            _memoeryCache.GetOrCreate(OpponentId, entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return opponentBoard;
@@ -51,8 +54,8 @@ namespace Battleship.API.Controllers
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
                 Results = new List<string> { battleship1Added, battleship2Added, battleship3Added },
-                PlayerId = playerId,
-                OpponentId = opponentId
+                PlayerId = PlayerId,
+                OpponentId = OpponentId
             };
         }
 
@@ -73,8 +76,8 @@ namespace Battleship.API.Controllers
             };
         }
 
-        [HttpPost("attack")]
-        public BattleshipResult Attack([FromBody] BattleshipOptions battleshipOptions)
+        [HttpPost("attackOpponent")]
+        public BattleshipResult AttackOpponent([FromBody] BattleshipOptions battleshipOptions)
         {
             var playerBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
             var opponentBoard = _memoeryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
@@ -87,6 +90,14 @@ namespace Battleship.API.Controllers
                 PlayerId = battleshipOptions.PlayerId,
                 OpponentId = battleshipOptions.OpponentId
             };
+        }
+
+        [HttpPost("reset")]
+        public string Reset([FromBody] BattleshipOptions battleshipOptions)
+        {
+            _memoeryCache.Remove(battleshipOptions.PlayerId);
+            _memoeryCache.Remove(battleshipOptions.OpponentId);
+            return "Board has been reset";
         }
 
         private static List<string> DisplayBoard(Cell[][] board)
