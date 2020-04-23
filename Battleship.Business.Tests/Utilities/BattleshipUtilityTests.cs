@@ -138,7 +138,7 @@ namespace Battleship.Business.Tests.Utilities
                 battleshipUtility.Attack(defaultBoard, 2, 2);
 
                 // Assert
-                var cell = defaultBoard[--row][--column];
+                var cell = defaultBoard[1][1];
                 Assert.AreEqual(missed, cell.Value);
             }
         }

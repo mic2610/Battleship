@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship.API", "Battleship\Battleship.API.csproj", "{FA0E192B-C6B4-4AA7-BFF0-1F195D297CAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship.Api", "Battleship.Api\Battleship.Api.csproj", "{FA0E192B-C6B4-4AA7-BFF0-1F195D297CAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship.Business", "Battleship.Business\Battleship.Business.csproj", "{BEE2F23D-3202-459D-A77F-B53EC2F678ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{68FD2FE6-57B3-4F4D-BEC0-88ACCAF8BA15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship.Business.Tests", "Battleship.Business.Tests\Battleship.Business.Tests.csproj", "{25D907F7-BC88-4FD4-843D-E29E684767E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship.Business.Tests", "Battleship.Business.Tests\Battleship.Business.Tests.csproj", "{25D907F7-BC88-4FD4-843D-E29E684767E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Battleship.API.Tests", "Battleship.API.Tests\Battleship.API.Tests.csproj", "{6AEBE5F6-5895-41D9-8FFC-B568BA544EA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battleship.Api.Tests", "Battleship.Api.Tests\Battleship.Api.Tests.csproj", "{6AEBE5F6-5895-41D9-8FFC-B568BA544EA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
