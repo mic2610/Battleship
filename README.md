@@ -4,12 +4,13 @@
 
 Battleship has been designed and developed as a single player game, using .NET Core 3.1 as a Web API to effectively accomodate the following functionality:
 
-Setup:
-Requires .NET Core 3.1: https://dotnet.microsoft.com/download/dotnet-core
-
 * Create a board
 * Add a battleship to the board
 * Take an “attack” at a given position, and report back whether the attack resulted in a hit or a miss.
+
+### Setup:
+* Requires .NET Core 3.1: https://dotnet.microsoft.com/download/dotnet-core
+* Application to query the API at "~battlefield"
 
 # Technical features:
 * Unit tests against the above units of work are in the "~/Tests/" solution folder
