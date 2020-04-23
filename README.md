@@ -62,7 +62,7 @@ JSON boday response:
 * Can only be a 10x10 board
 * "row" and "column" are index + 1 to make it easier for consuming code to add battleships
 * "alignment" can either be "Horizontal" or "Vertical"
-* "playerId" must always be posted as 1 and "opponentId" must always be posted as 2
+* "playerId" must always be posted through as 1 and "opponentId" must always be posted through as 2 to get the boards from cache
 
 POST "~/battleship/add" Request JSON:
 ```
@@ -116,12 +116,15 @@ POST ~/battleship/add Response JSON:
 * Attacks the opponent's board
 * "row" and "column" are index + 1 to make it easier for consuming code to attack battleships
 * Returns a message indicating whether there has been a hit or miss and even if a battleship has been destroyed on the opponent's board, these are returned in the "results" array but also marked on the board
+* "playerId" must always be posted through as 1 and "opponentId" must always be posted through as 2 to get the boards from cache
 
 POST "~/battleship/attackOpponent" Request JSON:
 ```
 {
   "row": 1,
-  "column": 3
+  "column": 3,
+  "playerId": 1,
+  "opponentId": 2
 }
 ```
 
