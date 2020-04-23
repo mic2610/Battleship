@@ -1,6 +1,7 @@
 # Battleship
 
 =======================================
+
 Battleship has been designed and developed as a single player game, using .NET Core 3.1 as a Web API to effectively accomodate the following functionality:
 
 Setup:

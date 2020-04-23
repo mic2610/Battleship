@@ -8,7 +8,7 @@ namespace Battleship.Business.Models
 
         public List<string> OpponentBoard { get; set; }
 
-        public List<string> Results { get; set; }
+        public string[] Results { get; set; }
 
         public int PlayerId { get; set; }
 

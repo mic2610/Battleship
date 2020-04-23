@@ -56,7 +56,7 @@ namespace Battleship.API.Controllers
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new List<string> { battleship1Added, battleship2Added, battleship3Added },
+                Results = new[] { battleship1Added, battleship2Added, battleship3Added },
                 PlayerId = PlayerId,
                 OpponentId = OpponentId
             };
@@ -73,7 +73,7 @@ namespace Battleship.API.Controllers
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new List<string> { battleshipAdded },
+                Results = new[] { battleshipAdded },
                 PlayerId = battleshipOptions.PlayerId,
                 OpponentId = battleshipOptions.OpponentId
             };
@@ -89,7 +89,7 @@ namespace Battleship.API.Controllers
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new List<string> { battleshipAttacked },
+                Results = new[] { battleshipAttacked },
                 PlayerId = battleshipOptions.PlayerId,
                 OpponentId = battleshipOptions.OpponentId
             };
