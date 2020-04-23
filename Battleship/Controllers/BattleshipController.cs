@@ -100,7 +100,7 @@ namespace Battleship.API.Controllers
         {
             _memoryCache.Remove(battleshipOptions.PlayerId);
             _memoryCache.Remove(battleshipOptions.OpponentId);
-            return "Board has been reset";
+            return $"Player board: {battleshipOptions.PlayerId} and opponent board: {battleshipOptions.OpponentId} have been reset";
         }
 
         private static List<string> DisplayBoard(Cell[][] board)
