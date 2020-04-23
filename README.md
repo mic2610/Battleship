@@ -161,8 +161,8 @@ POST ~/battleship/attackOpponent Response JSON:
     "results": [
         "You have destroyed a battleship starting at position of row: 1, column: 3"
     ],
-    "playerId": "9d75107e-759f-4181-951a-ea13ab0f01e0",
-    "opponentId": "c68c5818-7e44-478a-a6a2-d4b19c76c5db"
+    "playerId": 1,
+    "opponentId": 2
 }
 ```
 
