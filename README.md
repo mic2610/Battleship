@@ -2,7 +2,7 @@
 
 =======================================
 
-Battleship has been designed and developed as a single player game, using .NET Core 3.1 as a Web API to effectively accomodate the following functionality:
+Battleship has been designed and developed as a single player game, using .NET Core 3.1 as a Web API. It is loosely based upon the Hackerrank "Battleship 1 Player": https://www.hackerrank.com/challenges/battleship1p challenge and accomodates the following functionality:
 
 * Create a board
 * Add a battleship to the board
