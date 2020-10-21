@@ -31,6 +31,7 @@ namespace Battleship.Business.Utilities
             if (column <= 0 || column > Constants.BattleShip.MaxColumns)
                 return $"Not a valid column of {++column}, cannot be less than 1 or more than {Constants.BattleShip.MaxColumns}";
 
+            // Decrement the column and row as they are used within a jagged array
             column = --column;
             row = --row;
 
@@ -79,6 +80,7 @@ namespace Battleship.Business.Utilities
             if (column <= 0 || column > Constants.BattleShip.MaxColumns)
                 return $"Not a valid column of {++column}, cannot be less than 1 or more than {Constants.BattleShip.MaxColumns}";
 
+            // Decrement the column and row as they are used within a jagged array
             column = --column;
             row = --row;
 

@@ -40,17 +40,9 @@ namespace Battleship.API.Controllers
             var battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
             var battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
 
-            _memoryCache.GetOrCreate(PlayerId, entry =>
-            {
-                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
-                return playerBoard;
-            });
-
-            _memoryCache.GetOrCreate(OpponentId, entry =>
-            {
-                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
-                return opponentBoard;
-            });
+            // Cache both the player and opponent boards
+            _memoryCache.Set(PlayerId, playerBoard, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(10) });
+            _memoryCache.Set(OpponentId, opponentBoard, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(10) });
 
             return new BattleshipResult
             {
