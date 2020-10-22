@@ -143,7 +143,7 @@ namespace Battleship.Business.Tests.Utilities
             }
 
             [TestMethod]
-            public void ReturnsDestroyedBattleship()
+            public void ReturnsDestroyedHorizontalBattleship()
             {
                 // Arrange
                 var battleshipUtility = new BattleshipUtility();
@@ -160,6 +160,31 @@ namespace Battleship.Business.Tests.Utilities
                 battleshipUtility.Attack(defaultBoard, row, column + 1);
                 battleshipUtility.Attack(defaultBoard, row, column + 2);
                 battleshipUtility.Attack(defaultBoard, row, column + 3);
+
+                // Assert
+                var cell = defaultBoard[--row][--column];
+                if (cell is Models.Battleship battleship)
+                    Assert.AreEqual(destroyed, battleship.Value);
+            }
+
+            [TestMethod]
+            public void ReturnsDestroyedVerticalBattleship()
+            {
+                // Arrange
+                var battleshipUtility = new BattleshipUtility();
+                var defaultBoard = battleshipUtility.CreateDefaultBoard();
+                var row = 1;
+                var column = 1;
+                var shipSize = 4;
+                var alignment = Constants.BattleShip.Vertical;
+                var destroyed = Constants.BattleShip.Destroyed;
+
+                // Act
+                battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
+                battleshipUtility.Attack(defaultBoard, row, column);
+                battleshipUtility.Attack(defaultBoard, row + 1, column);
+                battleshipUtility.Attack(defaultBoard, row + 2, column);
+                battleshipUtility.Attack(defaultBoard, row + 3, column);
 
                 // Assert
                 var cell = defaultBoard[--row][--column];

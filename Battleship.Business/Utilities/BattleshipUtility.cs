@@ -109,64 +109,8 @@ namespace Battleship.Business.Utilities
                 battleship.Value = Constants.BattleShip.Hit;
                 board[row][column] = battleship;
 
-                // TODO: If all battleship cells are destroyed, set value as D
-
-                var battleShipDestroyed = false;
-
-                // Iterate through a battleship based on alignment to determine how many battleship cells have been hit and if a battleship has been destroyed
-                if (battleship.Alignment == Constants.BattleShip.Horizontal)
-                {
-                    battleShipDestroyed = BattleshipDestroyed(board, battleship, row);
-                    //battleShipDestroyed = NavigateBoard(board, row, battleship, ref hitBattleshipsCount);
-                    /*
-                     * bool battleShipDestroyed;
-                        for (var c = battleship.StartRow; c < battleship.Length; c++)
-                        {
-                            var selectedBattleship = board[row][c];
-                            if (selectedBattleship.Value == Constants.BattleShip.Hit)
-                                ++hitBattleshipsCount;
-                        }
-
-                        battleShipDestroyed = hitBattleshipsCount == battleship.Length;
-
-                        // TODO: Refactor
-                        // Mark on board if destroyed
-                        if (battleShipDestroyed)
-                        {
-                            for (var c = battleship.StartRow; c < battleship.Length; c++)
-                            {
-                                var selectedBattleship = board[row][c];
-                                selectedBattleship.Value = Constants.BattleShip.Destroyed;
-                                board[row][c] = selectedBattleship;
-                            }
-                        }
-                     */
-                }
-                else if (battleship.Alignment == Constants.BattleShip.Vertical)
-                {
-                    battleShipDestroyed = BattleshipDestroyed(board, battleship, column: column);
-                    //for (var r = battleship.StartColumn; r < battleship.Length; r++)
-                    //{
-                    //    var selectedBattleship = board[r][column];
-                    //    if (selectedBattleship.Value == Constants.BattleShip.Hit)
-                    //        ++hitBattleshipsCount;
-                    //}
-
-                    //battleShipDestroyed = hitBattleshipsCount == battleship.Length;
-
-                    //// TODO: Refactor
-                    //// Mark on board if destroyed
-                    //if (battleShipDestroyed)
-                    //{
-                    //    for (var r = battleship.StartColumn; r < battleship.Length; r++)
-                    //    {
-                    //        var selectedBattleship = board[r][column];
-                    //        selectedBattleship.Value = Constants.BattleShip.Destroyed;
-                    //        board[r][column] = selectedBattleship;
-                    //    }
-                    //}
-                }
-
+                // Determine whether a battleship has been destroyed
+                var battleShipDestroyed = BattleshipDestroyed(board, battleship, row, column);
                 return $"You have {(battleShipDestroyed ? "destroyed a battleship starting" : "hit a battleship")} at position of row: {++row}, column: {++column}";
             }
 
@@ -180,16 +124,18 @@ namespace Battleship.Business.Utilities
         /// <param name="battleship"></param>
         /// <param name="row"></param>
         /// <param name="column"></param>
-        /// <returns></returns>
-        private bool BattleshipDestroyed(Cell[][] board, Models.Battleship battleship, int? row = null, int? column = null)
+        /// <returns>Bool indicating whether the battleship has been destroyed</returns>
+        private bool BattleshipDestroyed(Cell[][] board, Models.Battleship battleship, int row, int column)
         {
             int hitBattleshipCellsCount = 0;
-            var horizontalNavigation = battleship.Alignment == Constants.BattleShip.Horizontal && row.HasValue;
 
-            // Navigate the board horizontally by default using the supplied row
+            // Determine alignment from the supplied battleship
+            var horizontalNavigation = battleship.Alignment == Constants.BattleShip.Horizontal;
+
+            // Navigate the board horizontally by default using the supplied row, else use the supplied column
             for (var i = horizontalNavigation ? battleship.StartRow : battleship.StartColumn; i < battleship.Length; i++)
             {
-                var selectedBattleship = board[horizontalNavigation ? row.Value : i][horizontalNavigation ? i : column.Value];
+                var selectedBattleship = board[horizontalNavigation ? row : i][horizontalNavigation ? i : column];
                 if (selectedBattleship.Value == Constants.BattleShip.Hit)
                     ++hitBattleshipCellsCount;
             }
@@ -202,11 +148,11 @@ namespace Battleship.Business.Utilities
                 for (var i = horizontalNavigation ? battleship.StartRow : battleship.StartColumn; i < battleship.Length; i++)
                 {
                     // Mark the selected battleship as destroyed
-                    var selectedBattleship = board[horizontalNavigation ? row.Value : i][horizontalNavigation ? i : column.Value];
+                    var selectedBattleship = board[horizontalNavigation ? row : i][horizontalNavigation ? i : column];
                     selectedBattleship.Value = Constants.BattleShip.Destroyed;
 
                     // Reset the battleship cell onto the board
-                    board[horizontalNavigation ? row.Value : i][horizontalNavigation ? i : column.Value] = selectedBattleship;
+                    board[horizontalNavigation ? row : i][horizontalNavigation ? i : column] = selectedBattleship;
                 }
             }
 
