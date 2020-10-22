@@ -32,17 +32,29 @@ namespace Battleship.API.Controllers
         [HttpGet]
         public BattleshipResult Get()
         {
-            var playerBoard = _battleshipUtility.CreateDefaultBoard();
-            var opponentBoard = _battleshipUtility.CreateDefaultBoard();
+            // Cache both the player board
+            var playerBoard = _memoryCache.GetOrCreate(PlayerId, entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
+                return _battleshipUtility.CreateDefaultBoard();
+            });
 
-            // Add battle ships for opponent
-            var battleship1Added = _battleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
-            var battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
-            var battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
+            var battleship1Added = string.Empty;
+            var battleship2Added = string.Empty;
+            var battleship3Added = string.Empty;
 
-            // Cache both the player and opponent boards
-            _memoryCache.Set(PlayerId, playerBoard, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(10) });
-            _memoryCache.Set(OpponentId, opponentBoard, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(10) });
+            // Cache the opponent board
+            var opponentBoard = _memoryCache.GetOrCreate(OpponentId, entry =>
+            {
+                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
+                var opponentBoard = _battleshipUtility.CreateDefaultBoard();
+
+                // Add battle ships for opponent
+                battleship1Added = _battleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
+                battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
+                battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
+                return opponentBoard;
+            });
 
             return new BattleshipResult
             {

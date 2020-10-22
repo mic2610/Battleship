@@ -141,6 +141,31 @@ namespace Battleship.Business.Tests.Utilities
                 var cell = defaultBoard[1][1];
                 Assert.AreEqual(missed, cell.Value);
             }
+
+            [TestMethod]
+            public void ReturnsDestroyedBattleship()
+            {
+                // Arrange
+                var battleshipUtility = new BattleshipUtility();
+                var defaultBoard = battleshipUtility.CreateDefaultBoard();
+                var row = 1;
+                var column = 1;
+                var shipSize = 4;
+                var alignment = Constants.BattleShip.Horizontal;
+                var destroyed = Constants.BattleShip.Destroyed;
+
+                // Act
+                battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
+                battleshipUtility.Attack(defaultBoard, row, column);
+                battleshipUtility.Attack(defaultBoard, row, column + 1);
+                battleshipUtility.Attack(defaultBoard, row, column + 2);
+                battleshipUtility.Attack(defaultBoard, row, column + 3);
+
+                // Assert
+                var cell = defaultBoard[--row][--column];
+                if (cell is Models.Battleship battleship)
+                    Assert.AreEqual(destroyed, battleship.Value);
+            }
         }
     }
 }

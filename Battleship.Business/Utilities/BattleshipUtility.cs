@@ -87,7 +87,11 @@ namespace Battleship.Business.Utilities
             var selectedRow = board[row];
             var cell = selectedRow[column];
             var hit = false;
-            if (cell.Value == Constants.BattleShip.PlaceHolder)
+            if (cell.Value == Constants.BattleShip.Destroyed)
+            {
+                return "You have already destroyed this battleship";
+            }
+            else if (cell.Value == Constants.BattleShip.PlaceHolder)
             {
                 cell.Value = Constants.BattleShip.Missed;
                 board[row][column] = cell;
@@ -105,26 +109,57 @@ namespace Battleship.Business.Utilities
                 var hitBattleshipsCount = 0;
 
                 // TODO: If all battleship cells are destroyed, set value as D
+
+                var battleShipDestroyed = false;
+
+                // Iterate through a battleship based on alignment
                 if (battleship.Alignment == Constants.BattleShip.Horizontal)
                 {
-                    for (var j = battleship.StartRow; j < battleship.Length; j++)
+                    for (var c = battleship.StartRow; c < battleship.Length; c++)
                     {
-                        var selectedBattleship = board[row][j];
+                        var selectedBattleship = board[row][c];
                         if (selectedBattleship.Value == Constants.BattleShip.Hit)
                             ++hitBattleshipsCount;
+                    }
+
+                    battleShipDestroyed = hitBattleshipsCount == battleship.Length;
+
+                    // TODO: Refactor
+                    // Mark on board if destroyed
+                    if (battleShipDestroyed)
+                    {
+                        for (var c = battleship.StartRow; c < battleship.Length; c++)
+                        {
+                            var selectedBattleship = board[row][c];
+                            selectedBattleship.Value = Constants.BattleShip.Destroyed;
+                            board[row][c] = selectedBattleship;
+                        }
                     }
                 }
                 else if (battleship.Alignment == Constants.BattleShip.Vertical)
                 {
-                    for (var i = battleship.StartColumn; i < battleship.Length; i++)
+                    for (var r = battleship.StartColumn; r < battleship.Length; r++)
                     {
-                        var selectedBattleship = board[i][column];
+                        var selectedBattleship = board[r][column];
                         if (selectedBattleship.Value == Constants.BattleShip.Hit)
                             ++hitBattleshipsCount;
                     }
+
+                    battleShipDestroyed = hitBattleshipsCount == battleship.Length;
+
+                    // TODO: Refactor
+                    // Mark on board if destroyed
+                    if (battleShipDestroyed)
+                    {
+                        for (var r = battleship.StartColumn; r < battleship.Length; r++)
+                        {
+                            var selectedBattleship = board[r][column];
+                            selectedBattleship.Value = Constants.BattleShip.Destroyed;
+                            board[r][column] = selectedBattleship;
+                        }
+                    }
                 }
 
-                var battleShipDestroyed = hitBattleshipsCount == battleship.Length;
                 return $"You have {(battleShipDestroyed ? "destroyed a battleship starting" : "hit a battleship")} at position of row: {++row}, column: {++column}";
             }
 
