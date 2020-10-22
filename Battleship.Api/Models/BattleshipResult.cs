@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Battleship.Business.Models
+namespace Battleship.Web.Models
 {
     public class BattleshipResult
     {

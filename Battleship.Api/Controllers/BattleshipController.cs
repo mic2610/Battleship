@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Battleship.API.Models;
 using Battleship.Business.Models;
 using Battleship.Business.Utilities;
+using Battleship.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
