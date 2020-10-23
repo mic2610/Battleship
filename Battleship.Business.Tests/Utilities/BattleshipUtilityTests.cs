@@ -68,8 +68,8 @@ namespace Battleship.Business.Tests.Utilities
                 var battleship = defaultBoard[--row][--column] as Models.Battleship;
                 Assert.IsNotNull(battleship);
                 Assert.AreEqual(ship, battleship.Value);
-                Assert.AreEqual(row, battleship.StartRow);
-                Assert.AreEqual(column, battleship.StartColumn);
+                Assert.AreEqual(row, battleship.RowStart);
+                Assert.AreEqual(column, battleship.ColumnStart);
                 Assert.AreEqual(shipSize, battleship.Length);
                 Assert.AreEqual(alignment, battleship.Alignment);
             }

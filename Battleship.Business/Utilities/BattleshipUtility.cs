@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Battleship.Business.Models;
+using Battleship.Core.Extensions;
 
 namespace Battleship.Business.Utilities
 {
@@ -23,6 +25,9 @@ namespace Battleship.Business.Utilities
             };
         }
 
+        /// <summary>
+        /// Add a battleship to a board
+        /// </summary>
         public string AddBattleship(Cell[][] board, int row, int column, int shipSize, string alignment)
         {
             if (row <= 0 || row > Constants.BattleShip.MaxRows)
@@ -48,10 +53,10 @@ namespace Battleship.Business.Utilities
                 if (endCell == null)
                     return $"Cannot create ship at position of row: {++row}, column: {++column} as it will exceed the length of the board";
 
-                for (var j = column; j < shipEndPosition; j++)
+                for (var c = column; c < shipEndPosition; c++)
                 {
-                    var battleShip = new Models.Battleship(Constants.BattleShip.Battleship) { Alignment = alignment, StartRow = column, StartColumn = row, Length = shipSize };
-                    selectedRow[j] = battleShip;
+                    var battleShip = new Models.Battleship(Constants.BattleShip.Battleship) { Alignment = alignment, RowStart = column, ColumnStart = row, Length = shipSize };
+                    selectedRow[c] = battleShip;
                 }
             }
 
@@ -62,16 +67,20 @@ namespace Battleship.Business.Utilities
                 if (endCell == null)
                     return $"Cannot create ship at position of row: {++row}, column: {++column} as it will exceed the length of the board";
 
-                for (var i = row; i < shipEndPosition; i++)
+                for (var r = row; r < shipEndPosition; r++)
                 {
-                    var battleShip = new Models.Battleship(Constants.BattleShip.Battleship) { Alignment = alignment, StartRow = column, StartColumn = row, Length = shipSize };
-                    board[i][column] = battleShip;
+                    var battleShip = new Models.Battleship(Constants.BattleShip.Battleship) { Alignment = alignment, RowStart = column, ColumnStart = row, Length = shipSize };
+                    board[r][column] = battleShip;
                 }
             }
 
             return $"Battleship created starting at position of row: {++row}, column: {++column}";
         }
 
+        /// <summary>
+        /// Attack a cell on a board, marked by a row and column
+        /// </summary>
+        /// <returns></returns>
         public string Attack(Cell[][] board, int row, int column)
         {
             // TODO: Create custom exception
@@ -127,17 +136,26 @@ namespace Battleship.Business.Utilities
         /// <returns>Bool indicating whether the battleship has been destroyed</returns>
         private bool BattleshipDestroyed(Cell[][] board, Models.Battleship battleship, int row, int column)
         {
-            int hitBattleshipCellsCount = 0;
+            var hitBattleshipCellsCount = 0;
 
             // Determine alignment from the supplied battleship
             var horizontalNavigation = battleship.Alignment == Constants.BattleShip.Horizontal;
 
+            // Create a dictionary with a string key of "{row},{column}" and value of battleship, then add each selected battleship to it and then if hitBattleshipCellsCount has reached the battleship length, navigate through it and mark as destroyed, use a .SafeSplit string extension to attain the row and index to add back to hitBattleshipsLookup 
+            // Set initial count so resizing is not required, this is a little more performant friendly
+            var hitBattleshipsLookup = new Dictionary<string, Models.Battleship>(battleship.Length);
+
             // Navigate the board horizontally by default using the supplied row, else use the supplied column
-            for (var i = horizontalNavigation ? battleship.StartRow : battleship.StartColumn; i < battleship.Length; i++)
+            for (var i = horizontalNavigation ? battleship.RowStart : battleship.ColumnStart; i < battleship.Length; i++)
             {
-                var selectedBattleship = board[horizontalNavigation ? row : i][horizontalNavigation ? i : column];
+                var selectedRow = horizontalNavigation ? row : i;
+                var selectedColumn = horizontalNavigation ? i : column;
+                var selectedBattleship = board[selectedRow][selectedColumn];
                 if (selectedBattleship.Value == Constants.BattleShip.Hit)
+                {
                     ++hitBattleshipCellsCount;
+                    hitBattleshipsLookup[$"{selectedRow},{selectedColumn}"] = selectedBattleship as Models.Battleship;
+                }
             }
 
             var battleShipDestroyed = hitBattleshipCellsCount == battleship.Length;
@@ -145,14 +163,20 @@ namespace Battleship.Business.Utilities
             // Mark on board if destroyed
             if (battleShipDestroyed)
             {
-                for (var i = horizontalNavigation ? battleship.StartRow : battleship.StartColumn; i < battleship.Length; i++)
+                foreach (var hitBattleship in hitBattleshipsLookup)
                 {
+                    var keyParts = hitBattleship.Key.SafeSplit(new[] { "," });
+                    var selectedRow = Convert.ToInt32(keyParts[0]);
+                    var selectedColumn = Convert.ToInt32(keyParts[1]);
+
+                    // Get the current battleship from the board
+                    var selectedBattleship = board[selectedRow][selectedColumn];
+
                     // Mark the selected battleship as destroyed
-                    var selectedBattleship = board[horizontalNavigation ? row : i][horizontalNavigation ? i : column];
                     selectedBattleship.Value = Constants.BattleShip.Destroyed;
 
                     // Reset the battleship cell onto the board
-                    board[horizontalNavigation ? row : i][horizontalNavigation ? i : column] = selectedBattleship;
+                    board[selectedRow][selectedColumn] = selectedBattleship;
                 }
             }
 
