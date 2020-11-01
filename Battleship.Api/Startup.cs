@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json.Serialization;
 
 namespace Battleship.API
 {
@@ -21,6 +22,15 @@ namespace Battleship.API
         {
             services.AddControllers();
             services.AddMemoryCache();
+
+            services
+            .AddMvc()
+            .AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                opts.JsonSerializerOptions.IgnoreNullValues = true;
+            });
+
             services.AddScoped<IBattleshipUtility, BattleshipUtility>();
         }
 

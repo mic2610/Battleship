@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Battleship.Business.Enums;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Battleship.Web.Models
 {
@@ -13,5 +15,8 @@ namespace Battleship.Web.Models
         public int PlayerId { get; set; }
 
         public int OpponentId { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public BattleshipResultType ResultType { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Battleship.API.Models;
+using Battleship.Business.Enums;
 using Battleship.Business.Models;
 using Battleship.Business.Utilities;
 using Battleship.Web.Models;
@@ -36,6 +37,7 @@ namespace Battleship.API.Controllers
             // Cache both the player board
             var playerBoard = _memoryCache.GetOrCreate(PlayerId, entry =>
             {
+                // TODO: Get or Add to a mongoDB and then cache
                 entry.SlidingExpiration = TimeSpan.FromMinutes(10);
                 return _battleshipUtility.CreateDefaultBoard();
             });
@@ -51,9 +53,9 @@ namespace Battleship.API.Controllers
                 var opponentBoard = _battleshipUtility.CreateDefaultBoard();
 
                 // Add battle ships for opponent
-                battleship1Added = _battleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal);
-                battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal);
-                battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical);
+                battleship1Added = _battleshipUtility.AddBattleship(opponentBoard, 1, 1, 3, Business.Constants.BattleShip.Horizontal)?.Message;
+                battleship2Added = _battleshipUtility.AddBattleship(opponentBoard, 9, 3, 5, Business.Constants.BattleShip.Horizontal)?.Message;
+                battleship3Added = _battleshipUtility.AddBattleship(opponentBoard, 3, 3, 4, Business.Constants.BattleShip.Vertical)?.Message;
                 return opponentBoard;
             });
 
@@ -78,9 +80,10 @@ namespace Battleship.API.Controllers
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new[] { battleshipAdded },
+                Results = new[] { battleshipAdded?.Message },
                 PlayerId = battleshipOptions.PlayerId,
-                OpponentId = battleshipOptions.OpponentId
+                OpponentId = battleshipOptions.OpponentId,
+                ResultType = battleshipAdded.ResultType
             };
         }
 
@@ -94,7 +97,7 @@ namespace Battleship.API.Controllers
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new[] { battleshipAttacked },
+                Results = new[] { battleshipAttacked.Message },
                 PlayerId = battleshipOptions.PlayerId,
                 OpponentId = battleshipOptions.OpponentId
             };
