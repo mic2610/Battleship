@@ -38,7 +38,7 @@ namespace Battleship.API.Controllers
             var playerBoard = _memoryCache.GetOrCreate(PlayerId, entry =>
             {
                 // TODO: Get or Add to a mongoDB and then cache
-                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
                 return _battleshipUtility.CreateDefaultBoard();
             });
 
@@ -49,7 +49,7 @@ namespace Battleship.API.Controllers
             // Cache the opponent board
             var opponentBoard = _memoryCache.GetOrCreate(OpponentId, entry =>
             {
-                entry.SlidingExpiration = TimeSpan.FromMinutes(10);
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
                 var opponentBoard = _battleshipUtility.CreateDefaultBoard();
 
                 // Add battle ships for opponent
@@ -70,36 +70,57 @@ namespace Battleship.API.Controllers
         }
 
         [HttpPost("add")]
-        public BattleshipResult Add([FromBody] BattleshipOptions battleshipOptions)
+        public ActionResult<BattleshipResult> Add([FromBody] BattleshipOptions battleshipOptions)
         {
-            var playerBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
-            var battleshipAdded = _battleshipUtility.AddBattleship(playerBoard, battleshipOptions.Row, battleshipOptions.Column, battleshipOptions.ShipSize.GetValueOrDefault(), battleshipOptions.Alignment);
+            // TODO: Get specific BadRequest message
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var playerBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
+            if (playerBoard == null)
+                return NotFound(nameof(playerBoard));
+
+            var result = _battleshipUtility.AddBattleship(playerBoard, battleshipOptions.Row.GetValueOrDefault(), battleshipOptions.Column.GetValueOrDefault(), battleshipOptions.ShipSize.GetValueOrDefault(), battleshipOptions.Alignment);
+
+            // TODO: Test NotFound result message
+            if (result == null)
+                return NotFound(nameof(result));
+
+            // TODO: Try with an error message
             var opponentBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
+            if (opponentBoard == null)
+                return NotFound();
+
             return new BattleshipResult
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
-                Results = new[] { battleshipAdded?.Message },
-                PlayerId = battleshipOptions.PlayerId,
-                OpponentId = battleshipOptions.OpponentId,
-                ResultType = battleshipAdded.ResultType
+                Results = new[] { result.Message },
+                PlayerId = battleshipOptions.PlayerId.GetValueOrDefault(),
+                OpponentId = battleshipOptions.OpponentId.GetValueOrDefault(),
+                ResultType = result.ResultType
             };
         }
 
         [HttpPost("attackOpponent")]
-        public BattleshipResult AttackOpponent([FromBody] BattleshipOptions battleshipOptions)
+        public ActionResult<BattleshipResult> AttackOpponent([FromBody] BattleshipOptions battleshipOptions)
         {
             var playerBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.PlayerId);
+            if (playerBoard == null)
+                return NotFound(nameof(playerBoard));
+
             var opponentBoard = _memoryCache.Get<Cell[][]>(battleshipOptions.OpponentId);
-            var battleshipAttacked = _battleshipUtility.Attack(opponentBoard, battleshipOptions.Row, battleshipOptions.Column);
+            if (opponentBoard == null)
+                return NotFound(nameof(opponentBoard));
+
+            var battleshipAttacked = _battleshipUtility.Attack(opponentBoard, battleshipOptions.Row.GetValueOrDefault(), battleshipOptions.Column.GetValueOrDefault());
             return new BattleshipResult
             {
                 PlayerBoard = DisplayBoard(playerBoard),
                 OpponentBoard = DisplayBoard(opponentBoard),
                 Results = new[] { battleshipAttacked.Message },
-                PlayerId = battleshipOptions.PlayerId,
-                OpponentId = battleshipOptions.OpponentId
+                PlayerId = battleshipOptions.PlayerId.GetValueOrDefault(),
+                OpponentId = battleshipOptions.OpponentId.GetValueOrDefault()
             };
         }
 

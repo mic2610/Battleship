@@ -8,6 +8,9 @@ using System;
 using Battleship.Business.Constants;
 using Battleship.API.Models;
 using Battleship.Business.Enums;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Battleship.Api.Tests.Controllers
 {
@@ -46,7 +49,7 @@ namespace Battleship.Api.Tests.Controllers
         }
 
         [TestClass]
-        public class Post
+        public class Add
         {
             // Set up test initialise class
             private static Mock<IBattleshipUtility> _battleshipUtility;
@@ -77,7 +80,31 @@ namespace Battleship.Api.Tests.Controllers
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(result.ResultType, BattleshipResultType.Added);
+                Assert.AreEqual(result.Value.ResultType, BattleshipResultType.Added);
+            }
+
+            [TestMethod]
+            public void AddsReturnsNotFound()
+            {
+                // Arrange
+                var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, PlayerId = 1, Row = 1, ShipSize = 4, OpponentId = 2 };
+
+                _battleshipUtility.Setup(
+                    m => m.AddBattleship(
+                            It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                        .Returns(new BattleshipUtilityResult("Battleship added", BattleshipResultType.Added));
+
+                var memoryCache = MockMemoryCacheService.GetMockedMemoryCache();
+                memoryCache.Set<Cell[][]>(0, null);
+                var battleshipController = new BattleshipController(memoryCache, _battleshipUtility.Object);
+
+                // Act
+                var result = battleshipController.Add(battleshipOptions);
+
+                // Assert
+                var notFoundObjectResult = result.Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
+                Assert.IsNull(result.Value);
+                Assert.AreEqual(notFoundObjectResult.StatusCode.Value, StatusCodes.Status404NotFound);
             }
         }
 
@@ -90,6 +117,19 @@ namespace Battleship.Api.Tests.Controllers
                     .Setup(x => x.TryGetValue(It.IsAny<object>(), out expectedValue))
                     .Returns(true);
                 return mockMemoryCache.Object;
+            }
+
+            public static IMemoryCache GetMockedMemoryCache()
+            {
+                var memoryCache = Mock.Of<IMemoryCache>();
+                var cachEntry = Mock.Of<ICacheEntry>();
+
+                var mockMemoryCache = Mock.Get(memoryCache);
+                mockMemoryCache
+                    .Setup(m => m.CreateEntry(It.IsAny<object>()))
+                    .Returns(cachEntry);
+
+                return memoryCache;
             }
         }
 
