@@ -132,7 +132,7 @@ namespace Battleship.API.Controllers
             return $"Player board: {battleshipOptions.PlayerId} and opponent board: {battleshipOptions.OpponentId} have been reset";
         }
 
-        private static List<string> DisplayBoard(Cell[][] board)
+        private List<string> DisplayBoard(Cell[][] board)
         {
             var values = new List<string>();
             for (var row = 0; row < board.Length; row++)

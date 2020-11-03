@@ -65,8 +65,6 @@ namespace Battleship.Api.Tests.Controllers
             {
                 // Arrange
                 var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, PlayerId = 1, Row = 1, ShipSize = 4, OpponentId = 2 };
-
-                // TODO: Create a new BattleshipUtilityResult with an enum specifying the type of the result, string containing the return message and any other additional required properties
                 _battleshipUtility.Setup(
                     m => m.AddBattleship(
                             It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -88,11 +86,7 @@ namespace Battleship.Api.Tests.Controllers
             {
                 // Arrange
                 var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, PlayerId = 1, Row = 1, ShipSize = 4, OpponentId = 2 };
-
-                _battleshipUtility.Setup(
-                    m => m.AddBattleship(
-                            It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                        .Returns(new BattleshipUtilityResult("Battleship added", BattleshipResultType.Added));
+                _battleshipUtility.Setup(m => m.AddBattleship(It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns((BattleshipUtilityResult)null);
 
                 var memoryCache = MockMemoryCacheService.GetMockedMemoryCache();
                 memoryCache.Set<Cell[][]>(0, null);
@@ -121,15 +115,14 @@ namespace Battleship.Api.Tests.Controllers
 
             public static IMemoryCache GetMockedMemoryCache()
             {
-                var memoryCache = Mock.Of<IMemoryCache>();
-                var cachEntry = Mock.Of<ICacheEntry>();
+                var mockMemoryCache = new Mock<IMemoryCache>();
+                var cachEntry = new Mock<ICacheEntry>();
 
-                var mockMemoryCache = Mock.Get(memoryCache);
                 mockMemoryCache
                     .Setup(m => m.CreateEntry(It.IsAny<object>()))
-                    .Returns(cachEntry);
+                    .Returns(cachEntry.Object);
 
-                return memoryCache;
+                return mockMemoryCache.Object;
             }
         }
 
