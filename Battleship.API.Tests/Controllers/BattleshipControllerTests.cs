@@ -20,12 +20,12 @@ namespace Battleship.Api.Tests.Controllers
         public class Get
         {
             // Set up test initialise class
-            private static Mock<IBattleshipUtility> _battleshipUtility;
+            private static Mock<IBattleshipUtility> _mockBattleshipUtility;
 
             [ClassInitialize]
             public static void Initialise(TestContext context)
             {
-                _battleshipUtility = new Mock<IBattleshipUtility>();
+                _mockBattleshipUtility = new Mock<IBattleshipUtility>();
             }
 
             [TestMethod]
@@ -34,16 +34,16 @@ namespace Battleship.Api.Tests.Controllers
                 // Arrange
                 var playerId = 1;
                 var defaultBoard = BattleshipUtilityTestHelpers.CreateDefaultBoard();
-                _battleshipUtility.Setup(m => m.CreateDefaultBoard()).Returns(defaultBoard);
+                _mockBattleshipUtility.Setup(m => m.CreateDefaultBoard()).Returns(defaultBoard);
                 var memoryCache = new MemoryCache(new MemoryCacheOptions());
-                var battleshipController = new BattleshipController(memoryCache, _battleshipUtility.Object);
+                var battleshipController = new BattleshipController(memoryCache, _mockBattleshipUtility.Object);
 
                 // Act
-                var result = battleshipController.Get();
+                var subject = battleshipController.Get();
 
                 // Assert
-                Assert.AreEqual(result.PlayerId, playerId);
-                Assert.IsNotNull(result.PlayerBoard);
+                Assert.AreEqual(subject.PlayerId, playerId);
+                Assert.IsNotNull(subject.PlayerBoard);
             }
 
         }
@@ -52,53 +52,76 @@ namespace Battleship.Api.Tests.Controllers
         public class Add
         {
             // Set up test initialise class
-            private static Mock<IBattleshipUtility> _battleshipUtility;
+            private static Mock<IBattleshipUtility> _mockBattleshipUtility;
 
             [ClassInitialize]
             public static void Initialise(TestContext context)
             {
-                _battleshipUtility = new Mock<IBattleshipUtility>();
+                _mockBattleshipUtility = new Mock<IBattleshipUtility>();
             }
 
             [TestMethod]
-            public void AddsValidBattleship()
+            public void ReturnsValidBattleship()
             {
                 // Arrange
                 var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, PlayerId = 1, Row = 1, ShipSize = 4, OpponentId = 2 };
-                _battleshipUtility.Setup(
+                _mockBattleshipUtility.Setup(
                     m => m.AddBattleship(
                             It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                         .Returns(new BattleshipUtilityResult("Battleship added", BattleshipResultType.Added));
 
                 var memoryCache = MockMemoryCacheService.GetMemoryCache(BattleshipUtilityTestHelpers.CreateDefaultBoard());
-                var battleshipController = new BattleshipController(memoryCache, _battleshipUtility.Object);
+                var battleshipController = new BattleshipController(memoryCache, _mockBattleshipUtility.Object);
 
                 // Act
-                var result = battleshipController.Add(battleshipOptions);
+                var subject = battleshipController.Add(battleshipOptions);
 
                 // Assert
-                Assert.IsNotNull(result);
-                Assert.AreEqual(result.Value.ResultType, BattleshipResultType.Added);
+                Assert.IsNotNull(subject);
+                Assert.AreEqual(subject.Value.ResultType, BattleshipResultType.Added);
             }
 
             [TestMethod]
-            public void AddsReturnsNotFound()
+            public void ReturnsNotFoundWhenPlayerboardIsNull()
             {
                 // Arrange
                 var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, PlayerId = 1, Row = 1, ShipSize = 4, OpponentId = 2 };
-                _battleshipUtility.Setup(m => m.AddBattleship(It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns((BattleshipUtilityResult)null);
+                _mockBattleshipUtility.Setup(m => m.AddBattleship(It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns((BattleshipUtilityResult)null);
 
+                Cell[][] playerBoard = null;
                 var memoryCache = MockMemoryCacheService.GetMockedMemoryCache();
-                memoryCache.Set<Cell[][]>(0, null);
-                var battleshipController = new BattleshipController(memoryCache, _battleshipUtility.Object);
+                memoryCache.Set(0, playerBoard);
+                var battleshipController = new BattleshipController(memoryCache, _mockBattleshipUtility.Object);
 
                 // Act
-                var result = battleshipController.Add(battleshipOptions);
+                var subject = battleshipController.Add(battleshipOptions);
 
                 // Assert
-                var notFoundObjectResult = result.Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
-                Assert.IsNull(result.Value);
+                var notFoundObjectResult = subject.Result as Microsoft.AspNetCore.Mvc.NotFoundObjectResult;
+                Assert.IsNull(subject.Value);
                 Assert.AreEqual(notFoundObjectResult.StatusCode.Value, StatusCodes.Status404NotFound);
+            }
+
+            [TestMethod]
+            public void ReturnsBadRequestWhenModelStateIsInvalid()
+            {
+                // Arrange
+                var battleshipOptions = new BattleshipOptions { Alignment = BattleShip.Horizontal, Column = 1, Row = 0, ShipSize = 4, OpponentId = 2 };
+                _mockBattleshipUtility.Setup(m => m.AddBattleship(It.IsAny<Cell[][]>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns((BattleshipUtilityResult)null);
+
+                Cell[][] playerBoard = null;
+                var memoryCache = MockMemoryCacheService.GetMockedMemoryCache();
+                memoryCache.Set(0, playerBoard);
+                var battleshipController = new BattleshipController(memoryCache, _mockBattleshipUtility.Object);
+
+                // Act
+                battleshipController.ModelState.AddModelError("Bad", "Request");
+                var subject = battleshipController.Add(battleshipOptions);
+
+                // Assert
+                var badRequestObjectResult = subject.Result as Microsoft.AspNetCore.Mvc.BadRequestObjectResult;
+                Assert.IsNull(subject.Value);
+                Assert.AreEqual(badRequestObjectResult.StatusCode.Value, StatusCodes.Status400BadRequest);
             }
         }
 
