@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Battleship.Api\Battleship.Api.csproj" />
+    <ProjectReference Include="..\..\Battleship.Api\Battleship.Api.csproj" />
   </ItemGroup>
 
 </Project>
