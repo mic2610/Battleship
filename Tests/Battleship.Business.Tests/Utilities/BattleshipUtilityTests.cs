@@ -62,7 +62,7 @@ namespace Battleship.Business.Tests.Utilities
                 var alignment = Constants.BattleShip.Horizontal;
 
                 // Act
-                battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
+                var result = battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
 
                 // Assert
                 var battleship = defaultBoard[--row][--column] as Models.Battleship;
@@ -72,6 +72,7 @@ namespace Battleship.Business.Tests.Utilities
                 Assert.AreEqual(column, battleship.ColumnStart);
                 Assert.AreEqual(shipSize, battleship.Length);
                 Assert.AreEqual(alignment, battleship.Alignment);
+                Assert.AreEqual(Enums.BattleshipResultType.Added, result.ResultType);
             }
 
             [TestMethod]
@@ -87,12 +88,13 @@ namespace Battleship.Business.Tests.Utilities
                 var alignment = Constants.BattleShip.Horizontal;
 
                 // Act
-                battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
+                var result = battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
 
                 // Assert
                 var cell = defaultBoard[--row][--column];
                 Assert.AreEqual(placeholder, cell.Value);
                 Assert.IsNull(cell as Models.Battleship);
+                Assert.AreEqual(Enums.BattleshipResultType.BoardOverflow, result.ResultType);
             }
         }
 
@@ -113,12 +115,14 @@ namespace Battleship.Business.Tests.Utilities
 
                 // Act
                 battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
-                battleshipUtility.Attack(defaultBoard, row, column);
+                var attackedResult = battleshipUtility.Attack(defaultBoard, row, column);
 
                 // Assert
                 var cell = defaultBoard[--row][--column];
                 if (cell is Models.Battleship battleship)
                     Assert.AreEqual(hit, battleship.Value);
+
+                Assert.AreEqual(Enums.BattleshipResultType.Hit, attackedResult.ResultType);
             }
 
             [TestMethod]
@@ -135,11 +139,12 @@ namespace Battleship.Business.Tests.Utilities
 
                 // Act
                 battleshipUtility.AddBattleship(defaultBoard, row, column, shipSize, alignment);
-                battleshipUtility.Attack(defaultBoard, 2, 2);
+                var attackedResult = battleshipUtility.Attack(defaultBoard, 2, 2);
 
                 // Assert
                 var cell = defaultBoard[1][1];
                 Assert.AreEqual(missed, cell.Value);
+                Assert.AreEqual(Enums.BattleshipResultType.Missed, attackedResult.ResultType);
             }
 
             [TestMethod]
@@ -159,12 +164,14 @@ namespace Battleship.Business.Tests.Utilities
                 battleshipUtility.Attack(defaultBoard, row, column);
                 battleshipUtility.Attack(defaultBoard, row, column + 1);
                 battleshipUtility.Attack(defaultBoard, row, column + 2);
-                battleshipUtility.Attack(defaultBoard, row, column + 3);
+                var finalAttackedResult = battleshipUtility.Attack(defaultBoard, row, column + 3);
 
                 // Assert
                 var cell = defaultBoard[--row][--column];
                 if (cell is Models.Battleship battleship)
                     Assert.AreEqual(destroyed, battleship.Value);
+
+                Assert.AreEqual(Enums.BattleshipResultType.Destroyed, finalAttackedResult.ResultType);
             }
 
             [TestMethod]
@@ -184,12 +191,14 @@ namespace Battleship.Business.Tests.Utilities
                 battleshipUtility.Attack(defaultBoard, row, column);
                 battleshipUtility.Attack(defaultBoard, row + 1, column);
                 battleshipUtility.Attack(defaultBoard, row + 2, column);
-                battleshipUtility.Attack(defaultBoard, row + 3, column);
+                var finalAttackedResult = battleshipUtility.Attack(defaultBoard, row + 3, column);
 
                 // Assert
                 var cell = defaultBoard[--row][--column];
                 if (cell is Models.Battleship battleship)
                     Assert.AreEqual(destroyed, battleship.Value);
+
+                Assert.AreEqual(Enums.BattleshipResultType.Destroyed, finalAttackedResult.ResultType);
             }
         }
     }
