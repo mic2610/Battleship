@@ -1,4 +1,6 @@
+using Battleship.Api.Validators;
 using Battleship.Business.Utilities;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,8 +31,13 @@ namespace Battleship.API
             {
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 opts.JsonSerializerOptions.IgnoreNullValues = true;
-            });
+            })
+            .AddFluentValidation();
 
+            // Validators
+            services.AddTransient<BattleshipOptionsValidator>();
+
+            // Utilities
             services.AddScoped<IBattleshipUtility, BattleshipUtility>();
         }
 

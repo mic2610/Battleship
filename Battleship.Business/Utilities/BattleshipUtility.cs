@@ -82,7 +82,6 @@ namespace Battleship.Business.Utilities
         /// <returns></returns>
         public BattleshipUtilityResult Attack(Cell[][] board, int row, int column)
         {
-            // TODO: Create custom exception
             var result = ValidatePositions(row, column);
             if (result != null)
                 return result;
@@ -124,6 +123,12 @@ namespace Battleship.Business.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Validate the row and column
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns>BattleshipUtilityResult</returns>
         private BattleshipUtilityResult ValidatePositions(int row, int column)
         {
             if (row <= 0 || row > Constants.BattleShip.MaxRows)
