@@ -54,6 +54,13 @@ namespace Battleship.Business.Utilities
 
                 for (var c = column; c < shipEndPosition; c++)
                 {
+                    var cell = selectedRow[c];
+                    if (cell.Value == Constants.BattleShip.Battleship && cell is Models.Battleship battleship)
+                        return new BattleshipUtilityResult($"You have already have a battleship at position of row: {++battleship.ColumnStart}, column: {++battleship.RowStart}", BattleshipResultType.AlreadyExists);
+                }
+
+                for (var c = column; c < shipEndPosition; c++)
+                {
                     var battleShip = new Models.Battleship(Constants.BattleShip.Battleship) { Alignment = alignment, RowStart = column, ColumnStart = row, Length = shipSize };
                     selectedRow[c] = battleShip;
                 }
@@ -65,6 +72,13 @@ namespace Battleship.Business.Utilities
                 var endCell = board.ElementAtOrDefault(shipEndPosition - 1);
                 if (endCell == null)
                     return new BattleshipUtilityResult($"Cannot create ship at position of row: {++row}, column: {++column} as it will exceed the length of the board", BattleshipResultType.BoardOverflow);
+
+                for (var r = row; r < shipEndPosition; r++)
+                {
+                    var cell = board[r][column];
+                    if (cell.Value == Constants.BattleShip.Battleship && cell is Models.Battleship battleship)
+                        return new BattleshipUtilityResult($"You have already have a battleship at position of row: {++battleship.ColumnStart}, column: {++battleship.RowStart}", BattleshipResultType.AlreadyExists);
+                }
 
                 for (var r = row; r < shipEndPosition; r++)
                 {
